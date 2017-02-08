@@ -1,4 +1,5 @@
 #include "Bird.h"
+#include <math.h>
 
 Bird::Bird() { }
 
@@ -16,15 +17,16 @@ void Bird::init(int amt) {
         
         velocities.push_back(ofVec3f(ofRandom(-1, 1),ofRandom(-1, 1),ofRandom(-1, 1)));
         positions.push_back(origin);
+        orth.push_back(ofVec3f(1,0,0));
         //speeds[amount] = {ofVec3f(1.0,1.0,1.0)};
         //positions[i] = origin;
 
-        primitive.getMesh().addVertex(ofVec3f(origin.x - 10,origin.y,origin.z));
-        primitive.getMesh().addVertex(ofVec3f(origin.x,origin.y,origin.z));
-        primitive.getMesh().addVertex(ofVec3f(origin.x,origin.y + 10,origin.z));
-        primitive.getMesh().addVertex(ofVec3f(origin.x,origin.y,origin.z));
-        primitive.getMesh().addVertex(ofVec3f(origin.x,origin.y + 10,origin.z));
-        primitive.getMesh().addVertex(ofVec3f(origin.x + 10,origin.y,origin.z));
+        primitive.getMesh().addVertex(origin - orth[i].normalize()*10);
+        primitive.getMesh().addVertex(origin);
+        primitive.getMesh().addVertex(origin + velocities[i].normalize()*10);
+        primitive.getMesh().addVertex(origin);
+        primitive.getMesh().addVertex(origin + velocities[i].normalize()*10);
+        primitive.getMesh().addVertex(origin + orth[i].normalize()*10);
     }
     primitive.getMesh().setMode(OF_PRIMITIVE_TRIANGLES);
 }
@@ -45,13 +47,48 @@ void Bird::draw() {
         }
         
         positions[i] += velocities[i];
+
+        //rotation crap
+//        ofVec3f newPosition = orth[i];
+//        float rotationy = atan2(-velocities[i].z, velocities[i].x);
+//        float rotationz = asin(velocities[i].y / mag);
+//        
+//        ofMatrix3x3 maty =  ofMatrix3x3(
+//                          cos(rotationy), 0, sin(rotationy),
+//                          0, 1, 0,
+//                          -sin(rotationy),0, cos(rotationy)
+//                          );
+//        
+//        ofMatrix3x3 matz =  ofMatrix3x3(
+//                          cos(rotationz), -sin(rotationz), 0 ,
+//                          sin(rotationz), cos(rotationz) , 0,
+//                          0, 0, 1
+//                          );
+//        
+//        ofMatrix3x3 mat = maty;//(matz * maty);
+//        ofVec4f temp = ofMatrix4x4(
+//                          mat.a, mat.b, mat.c, 0,
+//                          mat.d, mat.e, mat.f, 0,
+//                          mat.g, mat.h, mat.i, 0,
+//                          0, 0, 0, 1).postMult(ofVec4f(newPosition.x, newPosition.y, newPosition.z, 0));
+//        
+//        orth[i] = ofVec3f(temp.x, temp.y, temp.z);
         
-        primitive.getMesh().setVertex(i*6, ofVec3f(positions[i].x - 10,positions[i].y,positions[i].z));
-        primitive.getMesh().setVertex(i*6 + 1, ofVec3f(positions[i].x,positions[i].y,positions[i].z));
-        primitive.getMesh().setVertex(i*6 + 2, ofVec3f(positions[i].x,positions[i].y + 10,positions[i].z));
-        primitive.getMesh().setVertex(i*6 + 3, ofVec3f(positions[i].x,positions[i].y,positions[i].z));
-        primitive.getMesh().setVertex(i*6 + 4, ofVec3f(positions[i].x,positions[i].y + 10,positions[i].z));
-        primitive.getMesh().setVertex(i*6 + 5, ofVec3f(positions[i].x + 10,positions[i].y,positions[i].z));
+        
+        orth[i] = velocities[i].getPerpendicular(ofVec3f(0, positions[i].y, 0));
+        orth[i].normalize();
+        ofVec3f t_vel = velocities[i];
+        t_vel.normalize();
+        
+        ofVec3f wingd = velocities[i].getPerpendicular(orth[i]);
+        wingd.normalize();
+        
+        primitive.getMesh().setVertex(i*6, positions[i] - orth[i]*10 + wingd*sin(ofGetElapsedTimef()*6)*7);
+        primitive.getMesh().setVertex(i*6 + 1, positions[i]);
+        primitive.getMesh().setVertex(i*6 + 2, positions[i] + t_vel*10);
+        primitive.getMesh().setVertex(i*6 + 3, positions[i]);
+        primitive.getMesh().setVertex(i*6 + 4, positions[i] + t_vel*10);
+        primitive.getMesh().setVertex(i*6 + 5, positions[i] + orth[i]*10 + wingd*sin(ofGetElapsedTimef()*6)*7);
         
     }
     primitive.draw();

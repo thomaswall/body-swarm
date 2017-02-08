@@ -19,7 +19,7 @@ public:
     of3dPrimitive primitive;
     int amount;
     float boid_dist;
-    std::vector<ofVec3f> speeds;
+    std::vector<ofVec3f> orth;
     std::vector<ofVec3f> positions;
     std::vector<ofVec3f> velocities;
     
