@@ -5,6 +5,11 @@ void ofApp::setup(){
     ofBackground(20);
     bird = *new Bird();
     bird.init(500);
+    
+    ofEnableLighting();
+    ofEnableDepthTest();
+    ofSetSmoothLighting(true);
+    
 }
 
 //--------------------------------------------------------------

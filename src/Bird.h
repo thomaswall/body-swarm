@@ -23,4 +23,5 @@ public:
     std::vector<ofVec3f> positions;
     std::vector<ofVec3f> velocities;
     
+    ofLight pointLight;
 };

@@ -29,10 +29,22 @@ void Bird::init(int amt) {
         primitive.getMesh().addVertex(origin + orth[i].normalize()*10);
     }
     primitive.getMesh().setMode(OF_PRIMITIVE_TRIANGLES);
+    
+
+    material.setEmissiveColor(ofColor(100, 25, 100, 255));
+    material.setAmbientColor(ofColor(50, 50, 50, 255));
+    
+    pointLight.setPosition(0, 0, 0);
+    pointLight.setAmbientColor(ofColor(255, 255, 255, 255));
+    pointLight.setPointLight();
+    
 }
 
 void Bird::draw() {
     for(int i = 0; i < amount;i++) {
+        ofVec3f v1 = velocities[i];
+        v1.normalize();
+        
         if(ofRandom(0, 10) > 5) {
             velocities[i] += forces(i) * 1.1;
             velocities[i] += alignment(i) * 1.4;
@@ -46,52 +58,53 @@ void Bird::draw() {
             velocities[i] /= (mag / 5);
         }
         
+        ofVec3f v2 = velocities[i];
+        v2.normalize();
+        
         positions[i] += velocities[i];
-
-        //rotation crap
-//        ofVec3f newPosition = orth[i];
-//        float rotationy = atan2(-velocities[i].z, velocities[i].x);
-//        float rotationz = asin(velocities[i].y / mag);
-//        
-//        ofMatrix3x3 maty =  ofMatrix3x3(
-//                          cos(rotationy), 0, sin(rotationy),
-//                          0, 1, 0,
-//                          -sin(rotationy),0, cos(rotationy)
-//                          );
-//        
-//        ofMatrix3x3 matz =  ofMatrix3x3(
-//                          cos(rotationz), -sin(rotationz), 0 ,
-//                          sin(rotationz), cos(rotationz) , 0,
-//                          0, 0, 1
-//                          );
-//        
-//        ofMatrix3x3 mat = maty;//(matz * maty);
-//        ofVec4f temp = ofMatrix4x4(
-//                          mat.a, mat.b, mat.c, 0,
-//                          mat.d, mat.e, mat.f, 0,
-//                          mat.g, mat.h, mat.i, 0,
-//                          0, 0, 0, 1).postMult(ofVec4f(newPosition.x, newPosition.y, newPosition.z, 0));
-//        
-//        orth[i] = ofVec3f(temp.x, temp.y, temp.z);
         
         
         orth[i] = velocities[i].getPerpendicular(ofVec3f(0, positions[i].y, 0));
         orth[i].normalize();
+        float angle = - ofDegToRad(ofVec3f(v1.x, 0, v1.y).angle(ofVec3f(v2.x, 0, v2.y)));
+
+        
+        ofMatrix3x3 mat = ofMatrix3x3(
+                (1-cos(angle))*v2.x*v2.x + cos(angle), (1-cos(angle))*v2.x*v2.y - sin(angle)*v2.z, (1-cos(angle))*v2.x*v2.z + sin(angle)*v1.y,
+                (1-cos(angle))*v2.x*v2.y + sin(angle)*v2.z, (1-cos(angle))*v2.y*v2.y + cos(angle), (1-cos(angle))*v2.y*v2.z - sin(angle)*v2.x,
+                (1-cos(angle))*v2.x*v2.z - sin(angle)*v1.y, (1-cos(angle))*v2.y*v2.z + sin(angle)*v2.x, (1-cos(angle))*v2.z*v2.z + cos(angle));
+        
+        ofVec4f temp = ofMatrix4x4(
+                 mat.a, mat.b, mat.c, 0,
+                 mat.d, mat.e, mat.f, 0,
+                 mat.g, mat.h, mat.i, 0,
+                 0, 0, 0, 1).postMult(ofVec4f(orth[i].x, orth[i].y, orth[i].z, 0));
+        
+        
+        orth[i] = ofVec3f(temp.x, temp.y, temp.z);
+        
+        
+        
         ofVec3f t_vel = velocities[i];
         t_vel.normalize();
         
         ofVec3f wingd = velocities[i].getPerpendicular(orth[i]);
         wingd.normalize();
         
-        primitive.getMesh().setVertex(i*6, positions[i] - orth[i]*10 + wingd*sin(ofGetElapsedTimef()*6)*7);
+        primitive.getMesh().setVertex(i*6, positions[i] - orth[i]*10 + wingd*sin((ofGetElapsedTimef() + i/2)*6)*7);
         primitive.getMesh().setVertex(i*6 + 1, positions[i]);
         primitive.getMesh().setVertex(i*6 + 2, positions[i] + t_vel*10);
         primitive.getMesh().setVertex(i*6 + 3, positions[i]);
         primitive.getMesh().setVertex(i*6 + 4, positions[i] + t_vel*10);
-        primitive.getMesh().setVertex(i*6 + 5, positions[i] + orth[i]*10 + wingd*sin(ofGetElapsedTimef()*6)*7);
+        primitive.getMesh().setVertex(i*6 + 5, positions[i] + orth[i]*10 + wingd*sin((ofGetElapsedTimef() + i/2)*6)*7);
         
     }
+    
+    material.begin();
+    pointLight.enable();
     primitive.draw();
+    pointLight.disable();
+    material.end();
 }
 
 ofVec3f Bird::avoidWalls(int index) {
