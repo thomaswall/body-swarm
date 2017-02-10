@@ -24,4 +24,5 @@ public:
     std::vector<ofVec3f> velocities;
     
     ofLight pointLight;
+    ofLight pointLight2;
 };

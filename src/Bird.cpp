@@ -31,12 +31,16 @@ void Bird::init(int amt) {
     primitive.getMesh().setMode(OF_PRIMITIVE_TRIANGLES);
     
 
-    material.setEmissiveColor(ofColor(100, 25, 100, 255));
-    material.setAmbientColor(ofColor(50, 50, 50, 255));
+    material.setEmissiveColor(ofColor(200, 0, 255, 255));
+    material.setAmbientColor(ofColor(180, 0, 230, 255));
+    material.setShininess(20);
     
-    pointLight.setPosition(0, 0, 0);
-    pointLight.setAmbientColor(ofColor(255, 255, 255, 255));
+    pointLight.setPosition(0, 500, -200);
     pointLight.setPointLight();
+    pointLight2.setPosition(1000, 500, -200);
+    pointLight2.setPointLight();
+    
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
     
 }
 
@@ -102,8 +106,10 @@ void Bird::draw() {
     
     material.begin();
     pointLight.enable();
+    pointLight2.enable();
     primitive.draw();
     pointLight.disable();
+    pointLight2.disable();
     material.end();
 }
 
