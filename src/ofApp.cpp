@@ -4,7 +4,7 @@
 void ofApp::setup(){
     ofBackground(20);
     bird = *new Bird();
-    bird.init(500);
+    bird.init(1500);
     
     ofEnableLighting();
     ofEnableDepthTest();
@@ -24,6 +24,8 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofEnableDepthTest();
+    
+    ofLog(OF_LOG_NOTICE, ofToString(ofGetSeconds()));
     
     color.r = ofRandom(255.0f);
     color.g = ofRandom(255.0f);
