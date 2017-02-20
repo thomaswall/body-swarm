@@ -1,14 +1,13 @@
 #include "ofApp.h"
 
-//--------------------------------------------------------------
-void ofApp::setup() {
-	ofBackground(20);
-	//bird = *new Bird();
-	bird.init(300);
-
-	ofEnableLighting();
-	ofEnableDepthTest();
-	ofSetSmoothLighting(true);
+void ofApp::setup(){
+    ofBackground(20);
+    bird = *new Bird();
+    bird.init(800);
+    
+    ofEnableLighting();
+    ofEnableDepthTest();
+    ofSetSmoothLighting(true);
 }
 
 //--------------------------------------------------------------
@@ -27,6 +26,8 @@ void ofApp::draw(){
     ofEnableDepthTest();
 
 	ofBackground(0, 255);
+    
+    ofLog(OF_LOG_NOTICE, ofToString(ofGetSeconds()));
     
     color.r = ofRandom(255.0f);
     color.g = ofRandom(255.0f);

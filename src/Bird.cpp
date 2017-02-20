@@ -68,6 +68,16 @@ void Bird::init(int amt) {
 	bibuffer = new byte[depthWidth * depthHeight];
 	csp = new CameraSpacePoint[depthWidth * depthHeight];
     
+    for(int i =0; i<20; i++) {
+        lattice.push_back(std::vector<std::vector<std::vector<LatticeCube>>>());
+        for(int j=0; j<20; j++) {
+            lattice[i].push_back(std::vector<std::vector<LatticeCube>>());
+            for(int k=0; k<20; k++) {
+                lattice[i][j].push_back(std::vector<LatticeCube>());
+            }
+        }
+    }
+    
 }
 
 ofVec3f Bird::mapIndexToOF(int index) {
@@ -132,15 +142,60 @@ void Bird::draw() {
 	}
 
 	ofLog(OF_LOG_NOTICE) << people_points.size();
+    
+    for(int i =0; i<20; i++) {
+        for(int j=0; j<20; j++) {
+            for(int k=0; k<20; k++) {
+                lattice[i][j][k].clear();
+            }
+        }
+    }
+    
+    int resolution = 20;
+    LatticeCube lc = *new LatticeCube();
+    lc.location = ofVec3f(0,0,0);
+    lc.velocity = ofVec3f(0,0,0);
 
+    for(int i = 0; i < amount; i++) {
+        int x = positions[i].x / 1000 * resolution;
+        int y = positions[i].y / 1000 * resolution;
+        int z = -1*(positions[i].z - 300) / 1300 * resolution;
+        
+        lc.location = positions[i];
+        lc.velocity = velocities[i];
+        
+        
+        lattice[x][y][z].push_back(lc);
+    }
+    
     for(int i = 0; i < amount;i++) {
         ofVec3f v1 = velocities[i];
         v1.normalize();
         
+        
+           
         if(ofRandom(0, 10) > 5) {
-            velocities[i] += forces(i) * 1.1;
-            velocities[i] += alignment(i) * 1.4;
-            velocities[i] += cohesion(i) * 0.8;
+            int x = positions[i].x / 1000 * resolution;
+            int y = positions[i].y / 1000 * resolution;
+            int z = -1*(positions[i].z - 300) / 1300 * resolution;
+            
+            std::vector<LatticeCube> neighbors;
+            for(int j=x-1;j<=x+1;j+=2) {
+                for(int k=y-1;k<=y+1;k+=2) {
+                    for(int l=x-1;l<=x+1;l+=2) {
+                        if(j > 0 && k > 0 && l > 0 && j < 19 && k < 19 && l < 19) {
+                            neighbors.insert(neighbors.end(), lattice[j][k][l].begin(), lattice[j][k][l].end());
+                        }
+                    }
+                }
+            }
+            
+            if(x > 0 && y > 0 && z > 0 && x < 19 && y < 19 && z < 19)
+                neighbors.insert(neighbors.end(), lattice[x][y][z].begin(), lattice[x][y][z].end());
+            
+            velocities[i] += forces(i, neighbors) * 1.1;
+            velocities[i] += alignment(i, neighbors) * 1.4;
+            velocities[i] += cohesion(i, neighbors) * 0.8;
         }
         
         velocities[i] += avoidWalls(i);
@@ -272,17 +327,17 @@ ofVec3f Bird::avoider(ofVec3f target, int index) {
     
 }
 
-ofVec3f Bird::alignment(int index) {
+ofVec3f Bird::alignment(int index, std::vector<LatticeCube> neighbors) {
     float min_neighbor_dist = 50;
     ofVec3f acc_sum = ofVec3f(0,0,0);
     int acc_count = 0;
     
-    for(int i = 0; i < amount; i++) {
-        float d = positions[index].distance(positions[i]);
+    for(int i = 0; i < neighbors.size(); i++) {
+        float d = positions[index].distance(neighbors[i].location);
         
         if(d > 0 && d < min_neighbor_dist) {
             //alignment
-            acc_sum += velocities[i];
+            acc_sum += neighbors[i].velocity;
             acc_count++;
         }
     }
@@ -303,7 +358,7 @@ ofVec3f Bird::alignment(int index) {
     return steer;
 }
 
-ofVec3f Bird::cohesion(int index) {
+ofVec3f Bird::cohesion(int index, std::vector<LatticeCube> neighbors) {
     float desired_separation = 10*2;
     float min_neighbor_dist = 50;
 
@@ -313,13 +368,13 @@ ofVec3f Bird::cohesion(int index) {
     int acc_count = 0;
     int c_count = 0;
     
-    for(int i = 0; i < amount; i++) {
-        float d = positions[index].distance(positions[i]);
+    for(int i = 0; i < neighbors.size(); i++) {
+        float d = positions[index].distance(neighbors[i].location);
         
         if(d > 0 && d < min_neighbor_dist) {
             
             //cohesion
-            c_sum += positions[i];
+            c_sum += neighbors[i].location;
             c_count++;
         }
     }
@@ -341,7 +396,7 @@ ofVec3f Bird::cohesion(int index) {
     return steer;
 }
 
-ofVec3f Bird::forces(int index) {
+ofVec3f Bird::forces(int index, std::vector<LatticeCube> neighbors) {
     float desired_separation = 20*2;
     float min_neighbor_dist = 40;
     
@@ -353,12 +408,12 @@ ofVec3f Bird::forces(int index) {
     int acc_count = 0;
     int c_count = 0;
     
-    for(int i = 0; i < amount; i++) {
-        float d = positions[index].distance(positions[i]);
+    for(int i = 0; i < neighbors.size(); i++) {
+        float d = positions[index].distance(neighbors[i].location);
         
         //separation
         if(d > 0 && d < desired_separation) {
-            ofVec3f diff = positions[index] - positions[i];
+            ofVec3f diff = positions[index] - neighbors[i].location;
             diff.normalize();
             s_sum = s_sum + (diff / d);
             s_count++;
