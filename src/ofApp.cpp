@@ -1,15 +1,14 @@
 #include "ofApp.h"
 
 //--------------------------------------------------------------
-void ofApp::setup(){
-    ofBackground(20);
-    bird = *new Bird();
-    bird.init(500);
-    
-    ofEnableLighting();
-    ofEnableDepthTest();
-    ofSetSmoothLighting(true);
-    
+void ofApp::setup() {
+	ofBackground(20);
+	//bird = *new Bird();
+	bird.init(300);
+
+	ofEnableLighting();
+	ofEnableDepthTest();
+	ofSetSmoothLighting(true);
 }
 
 //--------------------------------------------------------------
@@ -19,11 +18,15 @@ void ofApp::update(){
 //    ofVec3f v2 = primitive.getMesh().getVertex(5);
 //    primitive.getMesh().setVertex(0, ofVec3f(v1.x, v1.y, v1.z + 2*sin(ofGetElapsedTimef()*10)));
 //    primitive.getMesh().setVertex(5, ofVec3f(v2.x, v2.y, v2.z + 2*sin(ofGetElapsedTimef()*10)));
+
+	//kinect.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofEnableDepthTest();
+
+	ofBackground(0, 255);
     
     color.r = ofRandom(255.0f);
     color.g = ofRandom(255.0f);

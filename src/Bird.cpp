@@ -1,9 +1,31 @@
 #include "Bird.h"
 #include <math.h>
 
-Bird::Bird() { }
+Bird::Bird() {}
 
 void Bird::init(int amt) {
+
+	HRESULT hr;
+	hr = GetDefaultKinectSensor(&sensor);
+	if (FAILED(hr))
+		exit;
+
+	sensor->Open();
+
+	IDepthFrameSource* dfs;
+	IBodyIndexFrameSource* bifs;
+	sensor->get_DepthFrameSource(&dfs);
+	sensor->get_BodyIndexFrameSource(&bifs);
+	sensor->get_CoordinateMapper(&cm);
+	bifs->OpenReader(&bifr);
+	dfs->OpenReader(&dfr);
+
+	IFrameDescription *fd;
+	dfs->get_FrameDescription(&fd);
+	fd->get_Width(&depthWidth);
+	fd->get_Height(&depthHeight);
+
+	//dfr->SubscribeFrameArrived(DFrameArrived);
     
     amount = amt;
     boid_dist = 20;
@@ -12,7 +34,7 @@ void Bird::init(int amt) {
         ofVec3f origin = ofVec3f(
             ofRandom(0, 1000),
             ofRandom(0, 800),
-            ofRandom(-1000, 300)
+            ofRandom(-300, 300)
         );
         
         velocities.push_back(ofVec3f(ofRandom(-1, 1),ofRandom(-1, 1),ofRandom(-1, 1)));
@@ -41,10 +63,76 @@ void Bird::init(int amt) {
     pointLight2.setPointLight();
     
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+	depthbuffer = new uint16_t[depthWidth * depthHeight];
+	bibuffer = new byte[depthWidth * depthHeight];
+	csp = new CameraSpacePoint[depthWidth * depthHeight];
     
 }
 
+ofVec3f Bird::mapIndexToOF(int index) {
+	return ofVec3f(-csp[index].X*400 + 500, -csp[index].Y*400 + 400, -csp[index].Z*100);
+}
+
 void Bird::draw() {
+
+	HRESULT hr;
+	IDepthFrame* df;
+	hr = dfr->AcquireLatestFrame(&df);
+	if (SUCCEEDED(hr)) {
+		df->CopyFrameDataToArray(depthWidth * depthHeight, depthbuffer);
+		cm->MapDepthFrameToCameraSpace(depthWidth * depthHeight, depthbuffer, depthWidth*depthHeight, csp);
+		df->Release();
+		df = nullptr;
+	}
+
+	IBodyIndexFrame* bif;
+	hr = bifr->AcquireLatestFrame(&bif);
+	if (SUCCEEDED(hr)) {
+		bif->CopyFrameDataToArray(depthWidth * depthHeight, bibuffer);
+		bif->Release();
+		bif = nullptr;
+
+		people_points.clear();
+		int count = 0;
+		int mask_counter = 0;
+		for (int i = 0; i < depthWidth * depthHeight; i++) {
+			int mask_count = 0;
+
+			if (depthWidth*depthHeight > i + depthWidth + 1 && i > depthWidth + 1)
+			{
+				if (bibuffer[i] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + depthWidth] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + depthWidth + 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + depthWidth - 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - depthWidth] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - depthWidth + 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - depthWidth - 1] != 0xff)
+					mask_count += 1;
+			}
+			if (bibuffer[i] != 0xff) {
+				count += 1;
+				if (mask_count > 0 && mask_count < 9)
+					mask_counter += 1;
+				if ((mask_count > 0 && mask_count < 9 && mask_counter%int(30 - i / (float(depthWidth)*float(depthHeight)) * 20) == 0) || count % int(300 - i/(float(depthWidth)*float(depthHeight))*200) == 0) {
+					people_points.push_back(mapIndexToOF(i));
+				}
+			}
+		}
+	}
+
+	ofLog(OF_LOG_NOTICE) << people_points.size();
+
     for(int i = 0; i < amount;i++) {
         ofVec3f v1 = velocities[i];
         v1.normalize();
@@ -56,6 +144,7 @@ void Bird::draw() {
         }
         
         velocities[i] += avoidWalls(i);
+		velocities[i] += BodySwarm(i) * 1.8;
 
         float mag = velocities[i].distance(ofVec3f(0,0,0));
         if(mag > 5) {
@@ -113,6 +202,42 @@ void Bird::draw() {
     material.end();
 }
 
+ofVec3f Bird::BodySwarm(int index) {
+	float min_neighbor_dist = 50;
+	ofVec3f c_sum = ofVec3f(0, 0, 0);
+	int c_count = 0;
+	int max_dist = 0;
+
+	for (int i = 0; i < people_points.size(); i++) {
+
+		float d = positions[index].distance(people_points[i]);
+
+		if (d > 0 && d < min_neighbor_dist && d > max_dist) {
+			//c_sum += people_points[i];
+			//c_count++;
+			max_dist = d;
+			c_sum = people_points[i];
+			c_count = 1;
+		}
+	}
+
+	ofVec3f steer = ofVec3f(0, 0, 0);
+	ofVec3f add = ofVec3f(0, 0, 0);
+
+	if (c_count > 0) {
+		c_sum /= c_count;
+		ofVec3f seek = c_sum - positions[index];
+		seek.normalize();
+		seek *= 3;
+		add = seek - velocities[index];
+		add.limit(1.5);
+		if (ofRandom(0, 10) > 5)
+			steer += add;
+	}
+
+	return steer;
+}
+
 ofVec3f Bird::avoidWalls(int index) {
     ofVec3f vec = ofVec3f();
     ofVec3f sum = ofVec3f(0,0,0);
@@ -132,7 +257,7 @@ ofVec3f Bird::avoidWalls(int index) {
     vec.set(positions[index].x, positions[index].y, 300);
     sum += avoider(vec, index);
     
-    vec.set(positions[index].x, positions[index].y, -1000);
+    vec.set(positions[index].x, positions[index].y, -300);
     sum += avoider(vec, index);
     
     return sum;
