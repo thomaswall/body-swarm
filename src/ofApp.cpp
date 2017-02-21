@@ -9,30 +9,30 @@ void ofApp::setup(){
     ofEnableLighting();
     ofEnableDepthTest();
     ofSetSmoothLighting(true);
+    ofSetVerticalSync(true);
+    
+    vp.load("/Users/thomaswall/Desktop/movie1.mov");
+    vp.play();
+    
+    pointLight.setPosition(500, 500, -995);
+    pointLight.setPointLight();
     
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-//    primitive.move(ofVec3f(cos(ofGetElapsedTimef()*5),sin(ofGetElapsedTimef()*5),0));
-//    ofVec3f v1 = primitive.getMesh().getVertex(0);
-//    ofVec3f v2 = primitive.getMesh().getVertex(5);
-//    primitive.getMesh().setVertex(0, ofVec3f(v1.x, v1.y, v1.z + 2*sin(ofGetElapsedTimef()*10)));
-//    primitive.getMesh().setVertex(5, ofVec3f(v2.x, v2.y, v2.z + 2*sin(ofGetElapsedTimef()*10)));
+    vp.update();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     ofEnableDepthTest();
     
-    ofLog(OF_LOG_NOTICE, ofToString(ofGetSeconds()));
-    
-    color.r = ofRandom(255.0f);
-    color.g = ofRandom(255.0f);
-    color.b = 150.0f;
-    color.a = 255.0f;
-    
     bird.draw();
+    ofTexture mesh = vp.getTexture();
+    ofDisableLighting();
+    mesh.draw(-800,-700, -1000, 2700, 2200);
+    ofEnableLighting();
     
 }
 
