@@ -134,14 +134,12 @@ void Bird::draw() {
 				count += 1;
 				if (mask_count > 0 && mask_count < 9)
 					mask_counter += 1;
-				if ((mask_count > 0 && mask_count < 9 && mask_counter%int(30 - i / (float(depthWidth)*float(depthHeight)) * 20) == 0) || count % int(300 - i/(float(depthWidth)*float(depthHeight))*200) == 0) {
+				if ((mask_count > 0 && mask_count < 9 && mask_counter%int(10 + i / (float(depthWidth)*float(depthHeight)) * 40) == 0) || count % int(100 + i/(float(depthWidth)*float(depthHeight))*400) == 0) {
 					people_points.push_back(mapIndexToOF(i));
 				}
 			}
 		}
 	}
-
-	ofLog(OF_LOG_NOTICE) << people_points.size();
     
     for(int i =0; i<20; i++) {
         for(int j=0; j<20; j++) {
@@ -159,13 +157,12 @@ void Bird::draw() {
     for(int i = 0; i < amount; i++) {
         int x = positions[i].x / 1000 * resolution;
         int y = positions[i].y / 1000 * resolution;
-        int z = -1*(positions[i].z - 300) / 1300 * resolution;
+        int z = -1*(positions[i].z - 300) / 600 * resolution;
         
         lc.location = positions[i];
         lc.velocity = velocities[i];
-        
-        
-        lattice[x][y][z].push_back(lc);
+        if(x < 20 && y < 20 && z < 20)
+			lattice[x][y][z].push_back(lc);
     }
     
     for(int i = 0; i < amount;i++) {
@@ -177,7 +174,7 @@ void Bird::draw() {
         if(ofRandom(0, 10) > 5) {
             int x = positions[i].x / 1000 * resolution;
             int y = positions[i].y / 1000 * resolution;
-            int z = -1*(positions[i].z - 300) / 1300 * resolution;
+            int z = -1*(positions[i].z - 300) / 600 * resolution;
             
             std::vector<LatticeCube> neighbors;
             for(int j=x-1;j<=x+1;j+=2) {
@@ -258,16 +255,17 @@ void Bird::draw() {
 }
 
 ofVec3f Bird::BodySwarm(int index) {
-	float min_neighbor_dist = 50;
+	float min_neighbor_dist = 300;
 	ofVec3f c_sum = ofVec3f(0, 0, 0);
 	int c_count = 0;
-	int max_dist = 0;
+	int max_dist = 100000000;
 
 	for (int i = 0; i < people_points.size(); i++) {
-
+		if (i > people_points.size() - 1)
+			break;
 		float d = positions[index].distance(people_points[i]);
 
-		if (d > 0 && d < min_neighbor_dist && d > max_dist) {
+		if (d > 0 && d < min_neighbor_dist && d < max_dist) {
 			//c_sum += people_points[i];
 			//c_count++;
 			max_dist = d;
@@ -285,8 +283,8 @@ ofVec3f Bird::BodySwarm(int index) {
 		seek.normalize();
 		seek *= 3;
 		add = seek - velocities[index];
-		add.limit(1.5);
-		if (ofRandom(0, 10) > 5)
+		add.limit(1.0);
+		if (ofRandom(0, 10) > 9)
 			steer += add;
 	}
 
