@@ -27,7 +27,8 @@ class ofApp : public ofBaseApp{
         ofMesh mesh;
         of3dPrimitive primitive;
         Bird bird;
-
-
+    
+        ofVideoPlayer vp;
+        ofLight pointLight;
 		
 };
