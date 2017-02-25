@@ -90,6 +90,8 @@ public:
 	int depthWidth = 0, depthHeight = 0;
 
 	std::vector<ofVec3f> people_points;
+	float people_uniform[3000];
+	int people_size;
     
     std::vector<std::vector<std::vector<std::vector<LatticeCube>>>> lattice;
 	AllVertices allverts;

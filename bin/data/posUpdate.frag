@@ -13,9 +13,8 @@ void main(void){
     vec3 vel = texture( velData, vTexCoord ).xyz;
     
     // Update the position.
-    pos += vel * 0.5;
+    pos += vel;// * 0.5;
     
     // And finally store it on the position FBO.
-    vFragColor = vec4(pos.x,pos.y,pos.z,1.0);
-	//vFragColor = vec4(vel.x, vel.y, vel.z, 1.0);
+    vFragColor = vec4(pos,1.0);
 }

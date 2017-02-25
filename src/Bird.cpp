@@ -100,7 +100,7 @@ void Bird::init(int amt) {
 
 			pos[i * 3 + 0] = ofRandom(1000.0); //x*offset;
 			pos[i * 3 + 1] = ofRandom(800.0); //y*offset;
-			pos[i * 3 + 2] = ofRandom(-1000.0, 300.0);
+			pos[i * 3 + 2] = ofRandom(-300.0, 300.0);
 		}
 	}
 
@@ -143,12 +143,76 @@ void Bird::init(int amt) {
 }
 
 void Bird::update() {
+	people_size = 0;
+
+	HRESULT hr;
+	IDepthFrame* df;
+	hr = dfr->AcquireLatestFrame(&df);
+	if (SUCCEEDED(hr)) {
+		df->CopyFrameDataToArray(depthWidth * depthHeight, depthbuffer);
+		cm->MapDepthFrameToCameraSpace(depthWidth * depthHeight, depthbuffer, depthWidth*depthHeight, csp);
+		df->Release();
+		df = nullptr;
+	}
+
+	IBodyIndexFrame* bif;
+	hr = bifr->AcquireLatestFrame(&bif);
+	if (SUCCEEDED(hr)) {
+		bif->CopyFrameDataToArray(depthWidth * depthHeight, bibuffer);
+		bif->Release();
+		bif = nullptr;
+
+		people_points.clear();
+		int count = 0;
+		int mask_counter = 0;
+		for (int i = 0; i < depthWidth * depthHeight; i++) {
+			int mask_count = 0;
+
+			if (depthWidth*depthHeight > i + depthWidth + 1 && i > depthWidth + 1)
+			{
+				if (bibuffer[i] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + depthWidth] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + depthWidth + 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i + depthWidth - 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - depthWidth] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - depthWidth + 1] != 0xff)
+					mask_count += 1;
+				if (bibuffer[i - depthWidth - 1] != 0xff)
+					mask_count += 1;
+			}
+			if (bibuffer[i] != 0xff) {
+				count += 1;
+				if (mask_count > 0 && mask_count < 9)
+					mask_counter += 1;
+				if ((mask_count > 0 && mask_count < 9 && mask_counter%int(10 + i / (float(depthWidth)*float(depthHeight)) * 40) == 0) || count % int(100 + i / (float(depthWidth)*float(depthHeight)) * 400) == 0) {
+					ofVec3f loc = mapIndexToOF(i);
+					people_uniform[people_size*3 + 0] = loc.x;
+					people_uniform[people_size*3 + 1] = loc.y;
+					people_uniform[people_size*3 + 2] = loc.z;
+					people_size += 1;
+				}
+			}
+		}
+	}
+
+
 	velPingPong.dst->begin();
 	ofClear(0);
 	updateVel.begin();
 	updateVel.setUniformTexture("velData", velPingPong.src->getTexture(), 0);   // passing the previus velocity information
 	updateVel.setUniformTexture("posData", posPingPong.src->getTexture(), 1);  // passing the position information
 	updateVel.setUniform1i("resolution", (int)textureRes);
+	updateVel.setUniform3fv("people_points", people_uniform, 1000);
+	updateVel.setUniform1i("people_size", people_size);
 
 	// draw the source velocity texture to be updated
 	velPingPong.src->draw(0, 0);
@@ -192,7 +256,7 @@ void Bird::update() {
 	updateRender.setUniform1f("time", (float)ofGetElapsedTimef());
 
 	ofPushStyle();
-	ofEnableBlendMode(OF_BLENDMODE_ADD);
+	//ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofSetColor(255);
 
 	mesh.draw();
