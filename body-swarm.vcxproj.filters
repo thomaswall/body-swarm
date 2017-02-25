@@ -54,5 +54,9 @@
   <ItemGroup>
     <None Include="data\bird.vert" />
     <None Include="data\bird.frag" />
+    <None Include="bin\data\nothing.vert" />
+    <None Include="bin\data\render.vert" />
+    <None Include="bin\data\render.frag" />
+    <None Include="bin\data\render.geom" />
   </ItemGroup>
 </Project>

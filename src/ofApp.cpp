@@ -2,24 +2,25 @@
 
 void ofApp::setup(){
     ofBackground(20);
-    bird = *new Bird();
-    bird.init(600);
+    bird.init(3000);
     
-    ofEnableLighting();
-    ofEnableDepthTest();
-    ofSetSmoothLighting(true);
-    ofSetVerticalSync(true);
+    //ofEnableLighting();
+    //ofEnableDepthTest();
+    //ofSetSmoothLighting(true);
+    //ofSetVerticalSync(true);
     
     vp.load("/Users/thomaswall/Desktop/movie1.mov");
     vp.play();
     
     pointLight.setPosition(500, 500, -995);
     pointLight.setPointLight();
+
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
     vp.update();
+	bird.update();
 }
 
 //--------------------------------------------------------------
@@ -29,7 +30,7 @@ void ofApp::draw(){
 
     ofTexture mesh = vp.getTexture();
     ofDisableLighting();
-    mesh.draw(-800,-700, -1000, 2700, 2200);
+   // mesh.draw(-800,-700, -1000, 2700, 2200);
     ofEnableLighting();
     
 }

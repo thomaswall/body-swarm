@@ -195,6 +195,10 @@ C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalInclu
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="bin\data\nothing.vert" />
+    <None Include="bin\data\render.frag" />
+    <None Include="bin\data\render.geom" />
+    <None Include="bin\data\render.vert" />
     <None Include="data\bird.frag" />
     <None Include="data\bird.vert" />
   </ItemGroup>

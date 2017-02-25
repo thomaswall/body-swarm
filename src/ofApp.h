@@ -30,5 +30,7 @@ class ofApp : public ofBaseApp{
     
         ofVideoPlayer vp;
         ofLight pointLight;
+
+		ofShader shader;
 		
 };
