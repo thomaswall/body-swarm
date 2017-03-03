@@ -6,6 +6,9 @@ Bird::Bird() {}
 void Bird::init(int amt) {
 	resolution = 20;
 
+	GLfloat lmodel_ambient[] = { 1.0, 0.2, 0.2, 1.0 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+
 	HRESULT hr;
 	hr = GetDefaultKinectSensor(&sensor);
 	if (FAILED(hr))
@@ -59,10 +62,11 @@ void Bird::init(int amt) {
     material.setAmbientColor(ofColor(180, 0, 230, 255));
     material.setShininess(20);
     
-    pointLight.setPosition(0, 500, -200);
-    pointLight.setPointLight();
-    pointLight2.setPosition(1000, 500, -200);
-    pointLight2.setPointLight();
+    //pointLight.setPosition(0, 500, -200);
+    //pointLight.setPointLight();
+    //pointLight2.setPosition(1000, 500, -200);
+    //pointLight2.setPointLight();
+	pointLight.enable();
     
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
@@ -135,6 +139,8 @@ void Bird::init(int amt) {
 			mesh.addTexCoord(ofVec2f(x, y));
 		}
 	}
+
+	mesh.setupIndicesAuto();
 
 	texImage.load("spark.png");
 	imageWidth = texImage.getWidth();
@@ -240,8 +246,6 @@ void Bird::update() {
 	posPingPong.swap();
 
 
-
-
 	renderFBO.begin();
 	ofClear(0, 0, 0, 0);
 	updateRender.begin();
@@ -258,10 +262,8 @@ void Bird::update() {
 	ofPushStyle();
 	//ofEnableBlendMode(OF_BLENDMODE_ADD);
 	ofSetColor(255);
-
 	mesh.draw();
-
-	ofDisableBlendMode();
+	//ofDisableBlendMode();
 	glEnd();
 
 	updateRender.end();
@@ -276,170 +278,6 @@ ofVec3f Bird::mapIndexToOF(int index) {
 void Bird::draw() {
 	ofSetColor(100, 255, 255);
 	renderFBO.draw(0, 0);
-
-
-	HRESULT hr;
-	IDepthFrame* df;
-	hr = dfr->AcquireLatestFrame(&df);
-	if (SUCCEEDED(hr)) {
-		df->CopyFrameDataToArray(depthWidth * depthHeight, depthbuffer);
-		cm->MapDepthFrameToCameraSpace(depthWidth * depthHeight, depthbuffer, depthWidth*depthHeight, csp);
-		df->Release();
-		df = nullptr;
-	}
-
-	IBodyIndexFrame* bif;
-	hr = bifr->AcquireLatestFrame(&bif);
-	if (SUCCEEDED(hr)) {
-		bif->CopyFrameDataToArray(depthWidth * depthHeight, bibuffer);
-		bif->Release();
-		bif = nullptr;
-
-		people_points.clear();
-		int count = 0;
-		int mask_counter = 0;
-		for (int i = 0; i < depthWidth * depthHeight; i++) {
-			int mask_count = 0;
-
-			if (depthWidth*depthHeight > i + depthWidth + 1 && i > depthWidth + 1)
-			{
-				if (bibuffer[i] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i + 1] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i - 1] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i + depthWidth] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i + depthWidth + 1] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i + depthWidth - 1] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i - depthWidth] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i - depthWidth + 1] != 0xff)
-					mask_count += 1;
-				if (bibuffer[i - depthWidth - 1] != 0xff)
-					mask_count += 1;
-			}
-			if (bibuffer[i] != 0xff) {
-				count += 1;
-				if (mask_count > 0 && mask_count < 9)
-					mask_counter += 1;
-				if ((mask_count > 0 && mask_count < 9 && mask_counter%int(10 + i / (float(depthWidth)*float(depthHeight)) * 40) == 0) || count % int(100 + i/(float(depthWidth)*float(depthHeight))*400) == 0) {
-					people_points.push_back(mapIndexToOF(i));
-				}
-			}
-		}
-	}
-    
-    for(int i =0; i<resolution; i++) {
-        for(int j=0; j<resolution; j++) {
-            for(int k=0; k<resolution; k++) {
-                lattice[i][j][k].clear();
-            }
-        }
-    }
-    
-    LatticeCube lc = *new LatticeCube();
-    lc.location = ofVec3f(0,0,0);
-    lc.velocity = ofVec3f(0,0,0);
-
-    for(int i = 0; i < amount; i++) {
-        int x = positions[i].x / 1000 * resolution;
-        int y = positions[i].y / 1000 * resolution;
-        int z = -1*(positions[i].z - 300) / 600 * resolution;
-        
-        lc.location = positions[i];
-        lc.velocity = velocities[i];
-        if(x < resolution && y < resolution && z < resolution)
-			lattice[x][y][z].push_back(lc);
-    }
-
-    for(int i = 0; i < amount;i++) {
-		//positions[i] = primitive.getMesh().getVertex(i*6+3);
-		velocities[i] = positions[i] - last_positions[i];
-		last_positions[i] = positions[i];
-  //      ofVec3f v1 = velocities[i];
-  //      v1.normalize();
-  //      
-  //      
-  //         
-  //      if(ofRandom(0, 10) > 5) {
-  //          int x = positions[i].x / 1000 * resolution;
-  //          int y = positions[i].y / 1000 * resolution;
-  //          int z = -1*(positions[i].z - 300) / 600 * resolution;
-  //          
-  //          std::vector<LatticeCube> neighbors;
-  //          for(int j=x-1;j<=x+1;j+=2) {
-  //              for(int k=y-1;k<=y+1;k+=2) {
-  //                  for(int l=x-1;l<=x+1;l+=2) {
-  //                      if(j > 0 && k > 0 && l > 0 && j < resolution-1 && k < resolution-1 && l < resolution-1) {
-  //                          neighbors.insert(neighbors.end(), lattice[j][k][l].begin(), lattice[j][k][l].end());
-  //                      }
-  //                  }
-  //              }
-  //          }
-  //          
-  //          if(x > 0 && y > 0 && z > 0 && x < resolution-1 && y < resolution-1 && z < resolution-1)
-  //              neighbors.insert(neighbors.end(), lattice[x][y][z].begin(), lattice[x][y][z].end());
-  //          
-  //          velocities[i] += forces(i, neighbors) * 1.1;
-  //          velocities[i] += alignment(i, neighbors) * 1.4;
-  //          velocities[i] += cohesion(i, neighbors) * 0.8;
-  //      }
-  //      
-  //      velocities[i] += avoidWalls(i);
-		//velocities[i] += BodySwarm(i) * 1.8;
-
-  //      float mag = velocities[i].distance(ofVec3f(0,0,0));
-  //      if(mag > 5) {
-  //          velocities[i] /= (mag / 5);
-  //      }
-  //      
-  //      ofVec3f v2 = velocities[i];
-  //      v2.normalize();
-  //      
-  //      positions[i] += velocities[i];
-  //      
-  //      
-  //      orth[i] = velocities[i].getPerpendicular(ofVec3f(0, positions[i].y, 0));
-  //      orth[i].normalize();
-  //      float angle = - ofDegToRad(ofVec3f(v1.x, 0, v1.y).angle(ofVec3f(v2.x, 0, v2.y)));
-
-  //      
-  //      /*ofMatrix3x3 mat = ofMatrix3x3(
-  //              (1-cos(angle))*v2.x*v2.x + cos(angle), (1-cos(angle))*v2.x*v2.y - sin(angle)*v2.z, (1-cos(angle))*v2.x*v2.z + sin(angle)*v1.y,
-  //              (1-cos(angle))*v2.x*v2.y + sin(angle)*v2.z, (1-cos(angle))*v2.y*v2.y + cos(angle), (1-cos(angle))*v2.y*v2.z - sin(angle)*v2.x,
-  //              (1-cos(angle))*v2.x*v2.z - sin(angle)*v1.y, (1-cos(angle))*v2.y*v2.z + sin(angle)*v2.x, (1-cos(angle))*v2.z*v2.z + cos(angle));
-  //      
-  //      ofVec4f temp = ofMatrix4x4(
-  //               mat.a, mat.b, mat.c, 0,
-  //               mat.d, mat.e, mat.f, 0,
-  //               mat.g, mat.h, mat.i, 0,
-  //               0, 0, 0, 1).postMult(ofVec4f(orth[i].x, orth[i].y, orth[i].z, 0));
-  //      
-  //      
-  //      orth[i] = ofVec3f(temp.x, temp.y, temp.z);*/
-  //      
-  //      
-  //      
-  //      ofVec3f t_vel = velocities[i];
-  //      t_vel.normalize();
-  //      
-  //      ofVec3f wingd = velocities[i].getPerpendicular(orth[i]);
-  //      wingd.normalize();
-  //      
-  //      primitive.getMesh().setVertex(i*6, positions[i] - orth[i]*10 + wingd*sin((ofGetElapsedTimef() + i/2)*6)*7);
-  //      primitive.getMesh().setVertex(i*6 + 1, positions[i]);
-  //      primitive.getMesh().setVertex(i*6 + 2, positions[i] + t_vel*10);
-  //      primitive.getMesh().setVertex(i*6 + 3, positions[i]);
-  //      primitive.getMesh().setVertex(i*6 + 4, positions[i] + t_vel*10);
-  //      primitive.getMesh().setVertex(i*6 + 5, positions[i] + orth[i]*10 + wingd*sin((ofGetElapsedTimef() + i/2)*6)*7);
-        
-		allverts.positions[i] = positions[i];
-		allverts2.positions[i] = velocities[i];
-    }
 
  //   //material.begin();
  //   pointLight.enable();
@@ -456,185 +294,4 @@ void Bird::draw() {
  //   pointLight.disable();
  //   pointLight2.disable();
     //material.end();
-}
-
-ofVec3f Bird::BodySwarm(int index) {
-	float min_neighbor_dist = 300;
-	ofVec3f c_sum = ofVec3f(0, 0, 0);
-	int c_count = 0;
-	int max_dist = 100000000;
-	if (ofRandom(0, 10) > 9) {
-		for (int i = 0; i < people_points.size(); i++) {
-			if (i > people_points.size() - 1)
-				break;
-			float d = positions[index].distance(people_points[i]);
-
-			if (d > 0 && d < min_neighbor_dist && d < max_dist) {
-				//c_sum += people_points[i];
-				//c_count++;
-				max_dist = d;
-				c_sum = people_points[i];
-				c_count = 1;
-			}
-		}
-	}
-
-	ofVec3f steer = ofVec3f(0, 0, 0);
-	ofVec3f add = ofVec3f(0, 0, 0);
-
-	if (c_count > 0) {
-		c_sum /= c_count;
-		ofVec3f seek = c_sum - positions[index];
-		seek.normalize();
-		seek *= 3;
-		add = seek - velocities[index];
-		add.limit(1.0);
-		steer += add;
-	}
-
-	return steer;
-}
-
-ofVec3f Bird::avoidWalls(int index) {
-    ofVec3f vec = ofVec3f();
-    ofVec3f sum = ofVec3f(0,0,0);
-    
-    vec.set(0, positions[index].y, positions[index].z);
-    sum += avoider(vec, index);
-    
-    vec.set(1000, positions[index].y, positions[index].z);
-    sum += avoider(vec, index);
-    
-    vec.set(positions[index].x, 0, positions[index].z);
-    sum += avoider(vec, index);
-    
-    vec.set(positions[index].x, 800, positions[index].z);
-    sum += avoider(vec, index);
-    
-    vec.set(positions[index].x, positions[index].y, 300);
-    sum += avoider(vec, index);
-    
-    vec.set(positions[index].x, positions[index].y, -300);
-    sum += avoider(vec, index);
-    
-    return sum;
-}
-
-ofVec3f Bird::avoider(ofVec3f target, int index) {
-    ofVec3f steer = ofVec3f(positions[index]);
-    steer -= target;
-    steer *= 3;
-    steer *= (1 / positions[index].squareDistance(target));
-    return steer;
-    
-}
-
-ofVec3f Bird::alignment(int index, std::vector<LatticeCube> neighbors) {
-    float min_neighbor_dist = 1024 / resolution;
-    ofVec3f acc_sum = ofVec3f(0,0,0);
-    int acc_count = 0;
-    
-    for(int i = 0; i < neighbors.size(); i++) {
-        float d = positions[index].distance(neighbors[i].location);
-        
-        if(d > 0 && d < min_neighbor_dist) {
-            //alignment
-            acc_sum += neighbors[i].velocity;
-            acc_count++;
-        }
-    }
-    
-    ofVec3f steer = ofVec3f(0,0,0);
-    ofVec3f add = ofVec3f(0,0,0);
-    
-    if(acc_count > 0) {
-        acc_sum /= acc_count;
-        acc_sum.normalize();
-        acc_sum *= 3;
-        add = acc_sum - velocities[index];
-        add.limit(0.1);
-        if(ofRandom(0, 10) > 6)
-            steer += add;
-    }
-    
-    return steer;
-}
-
-ofVec3f Bird::cohesion(int index, std::vector<LatticeCube> neighbors) {
-    float desired_separation = 10*2;
-    float min_neighbor_dist = 1024 / resolution;
-
-    ofVec3f c_sum = ofVec3f(0,0,0);
-    
-    int s_count = 0;
-    int acc_count = 0;
-    int c_count = 0;
-    
-    for(int i = 0; i < neighbors.size(); i++) {
-        float d = positions[index].distance(neighbors[i].location);
-        
-        if(d > 0 && d < min_neighbor_dist) {
-            
-            //cohesion
-            c_sum += neighbors[i].location;
-            c_count++;
-        }
-    }
-    
-    ofVec3f steer = ofVec3f(0,0,0);
-    ofVec3f add = ofVec3f(0,0,0);
-    
-    if(c_count > 0) {
-        c_sum /= c_count;
-        ofVec3f seek = c_sum - positions[index];
-        seek.normalize();
-        seek *= 3;
-        add = seek - velocities[index];
-        add.limit(0.1);
-        if(ofRandom(0, 10) > 6)
-            steer += add;
-    }
-    
-    return steer;
-}
-
-ofVec3f Bird::forces(int index, std::vector<LatticeCube> neighbors) {
-    float desired_separation = 20*2;
-    float min_neighbor_dist = 1024 / resolution - 10;
-    
-    ofVec3f s_sum = ofVec3f(0,0,0);
-    ofVec3f acc_sum = ofVec3f(0,0,0);
-    ofVec3f c_sum = ofVec3f(0,0,0);
-    
-    int s_count = 0;
-    int acc_count = 0;
-    int c_count = 0;
-    
-    for(int i = 0; i < neighbors.size(); i++) {
-        float d = positions[index].distance(neighbors[i].location);
-        
-        //separation
-        if(d > 0 && d < desired_separation) {
-            ofVec3f diff = positions[index] - neighbors[i].location;
-            diff.normalize();
-            s_sum = s_sum + (diff / d);
-            s_count++;
-        }
-    }
-    
-    ofVec3f steer = ofVec3f(0,0,0);
-    ofVec3f add = ofVec3f(0,0,0);
-    
-    if (s_count > 0) {
-        s_sum /= s_count;
-        s_sum.normalize();
-        s_sum *= 3;
-        add = s_sum - velocities[index];
-        add.limit(0.1);
-        if(ofRandom(0, 10) > 6)
-            steer += add;
-    }
-   steer += add * 1.0;
-    
-    return steer;
 }

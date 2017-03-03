@@ -2,11 +2,11 @@
 
 void ofApp::setup(){
     ofBackground(20);
-    bird.init(3000);
+    bird.init(5000);
     
-    //ofEnableLighting();
-    //ofEnableDepthTest();
-    //ofSetSmoothLighting(true);
+    ofEnableLighting();
+    ofEnableDepthTest();
+    ofSetSmoothLighting(true);
     //ofSetVerticalSync(true);
     
     vp.load("/Users/thomaswall/Desktop/movie1.mov");

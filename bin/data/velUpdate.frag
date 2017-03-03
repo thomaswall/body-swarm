@@ -60,7 +60,7 @@ vec3 bodySwarm(vec3 pos, vec3 vel) {
 	vec3 steer = vec3(0, 0, 0);
 	vec3 add = vec3(0, 0, 0);
 
-	if (rand(normalize(pos.xy)) > 0.8) {
+	if (rand(normalize(pos.xy)) > 0.7) {
 		for (int i = 0; i < people_size; i++) {
 			float d = distance(pos, people_points[i]);
 
