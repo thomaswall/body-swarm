@@ -16,8 +16,9 @@
     <ClCompile Include="src\ofApp.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\of_v0.9.8_vs_release\addons\ofxUbo\src\ofxUbo.cpp">
-      <Filter>addons\ofxUbo\src</Filter>
+    <ClCompile Include="..\..\addons\ofxUbo\src\ofxUbo.cpp" />
+    <ClCompile Include="src\ofVRCamera.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -44,8 +45,9 @@
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\of_v0.9.8_vs_release\addons\ofxUbo\src\ofxUbo.h">
-      <Filter>addons\ofxUbo\src</Filter>
+    <ClInclude Include="..\..\of_v0.9.8_vs_release\addons\ofxUbo\src\ofxUbo.h" />
+    <ClInclude Include="src\ofVRCamera.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

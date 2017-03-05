@@ -49,19 +49,19 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="../of_v0.9.8_vs_release/libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
+    <Import Project="..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="../of_v0.9.8_vs_release/libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
+    <Import Project="..\..\libs\openFrameworksCompiled\project\vs\openFrameworksRelease.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="../of_v0.9.8_vs_release/libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
+    <Import Project="..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="../of_v0.9.8_vs_release/libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
+    <Import Project="..\..\libs\openFrameworksCompiled\project\vs\openFrameworksDebug.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -95,16 +95,15 @@
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>C:\Program Files\Microsoft SDKs\Kinect\v2.0_1409\inc;%(AdditionalIncludeDirectories);src;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\CL;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2\protocol;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2\usb;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\libfreenect2;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include\libusb;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include\libusb\os;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\protonect;libs/libusb/include/libusb;libs/turbo-jpeg/include;libs/libfreenect2/include;libs/libfreenect2/include/internal;libs/libfreenect2/include/internal/libfreenect2/usb;libs/protonect;
-C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\addons\ofxUbo\src\;C:\Program Files\Microsoft SDKs\Kinect\v2.0_1409\inc;%(AdditionalIncludeDirectories);src</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalLibraryDirectories>C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\KCBv2\lib\x86;$(KINECTSDK20_DIR)Lib\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Kinect20.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\Program Files\Microsoft SDKs\Kinect\v2.0_1409\Lib\x86\Kinect20.lib;C:\Program Files\Microsoft SDKs\Kinect\v2.0_1409\Lib\x86\Kinect20.Face.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent />
   </ItemDefinitionGroup>
@@ -117,8 +116,7 @@ C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalInclu
       <WarningLevel>Level3</WarningLevel>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <AdditionalIncludeDirectories>
-C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -134,8 +132,7 @@ C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src;%(AdditionalIncl
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\CL;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2\protocol;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2\usb;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\libfreenect2;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include\libusb;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include\libusb\os;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\protonect;libs/libusb/include/libusb;libs/turbo-jpeg/include;libs/libfreenect2/include;libs/libfreenect2/include/internal;libs/libfreenect2/include/internal/libfreenect2/usb;libs/protonect;
-C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -156,8 +153,7 @@ C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalInclu
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\CL;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2\protocol;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\internal\libfreenect2\usb;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libfreenect2\include\libfreenect2;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include\libusb;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\libusb\include\libusb\os;C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxKinectV2\libs\protonect;libs/libusb/include/libusb;libs/turbo-jpeg/include;libs/libfreenect2/include;libs/libfreenect2/include/internal;libs/libfreenect2/include/internal/libfreenect2/usb;libs/protonect;
-C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
     </ClCompile>
     <Link>
@@ -172,18 +168,20 @@ C:\Users\Christopher\dev\of_v0.9.8_vs_release\addons\ofxUbo\src</AdditionalInclu
     <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\of_v0.9.8_vs_release\addons\ofxUbo\src\ofxUbo.cpp" />
+    <ClCompile Include="..\..\addons\ofxUbo\src\ofxUbo.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\ofApp.cpp" />
     <ClCompile Include="src\Bird.cpp" />
+    <ClCompile Include="src\ofVRCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\of_v0.9.8_vs_release\addons\ofxUbo\src\ofxUbo.h" />
+    <ClInclude Include="..\..\of_v0.9.8_vs_release\addons\ofxUbo\src\ofxUbo.h" />
     <ClInclude Include="src\ofApp.h" />
     <ClInclude Include="src\Bird.h" />
+    <ClInclude Include="src\ofVRCamera.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
+    <ProjectReference Include="..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
       <Project>{5837595d-aca9-485c-8e76-729040ce4b0b}</Project>
     </ProjectReference>
   </ItemGroup>
