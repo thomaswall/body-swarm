@@ -110,7 +110,7 @@ void ofVRCamera::update()
 					auto curr = camera.getPosition();
 					camera.setPosition(ofVec3f(ofGetWindowWidth() / 2 + diff.X, ofGetWindowHeight() / 2 - diff.Y, 665 + diff.Z));
 					//camera.setLensOffset(ofVec2f(-diff.X / 500, diff.Y / 500));
-					camera.lookAt(ofVec3f(ofGetWindowWidth() / 2 - diff.X / 10, ofGetWindowHeight() / 2 - diff.Y / 10, -diff.Z / 10));
+					camera.lookAt(ofVec3f(ofGetWindowWidth() / 2 - diff.X / 10, ofGetWindowHeight() / 2 - diff.Y / 10, 100));
 					curr = camera.getPosition();
 
 					auto lookdir = camera.getLookAtDir();

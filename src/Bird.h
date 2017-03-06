@@ -2,6 +2,7 @@
 #include "ofMain.h"
 #include "ofxUbo.h"
 #include "Kinect.h"
+#include "ofVRCamera.h"
 
 
 struct AllVertices
@@ -52,7 +53,7 @@ public:
 class Bird {
     
 public:
-    Bird();
+    Bird(IKinectSensor* _sensor);
     void init(int amt);
 	ofVec3f mapIndexToOF(int index);
     void draw();
@@ -114,4 +115,6 @@ public:
 	ofImage texImage;
 	int imageWidth;
 	int imageHeight;
+
+	ofVRCamera* camera;
 };

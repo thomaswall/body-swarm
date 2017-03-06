@@ -1,7 +1,10 @@
 #include "Bird.h"
 #include <math.h>
 
-Bird::Bird() {}
+Bird::Bird(IKinectSensor* _sensor) {
+	this->sensor = _sensor;
+	camera = new ofVRCamera(sensor);
+}
 
 void Bird::init(int amt) {
 	resolution = 20;
@@ -10,11 +13,13 @@ void Bird::init(int amt) {
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 
 	HRESULT hr;
-	hr = GetDefaultKinectSensor(&sensor);
+	
+	/*hr = GetDefaultKinectSensor(&sensor);
 	if (FAILED(hr))
 		exit;
 
 	sensor->Open();
+	*/
 
 	IDepthFrameSource* dfs;
 	IBodyIndexFrameSource* bifs;
@@ -269,6 +274,7 @@ void Bird::update() {
 	updateRender.end();
 	renderFBO.end();
 	ofPopStyle();
+	camera->update();
 }
 
 ofVec3f Bird::mapIndexToOF(int index) {
@@ -276,8 +282,10 @@ ofVec3f Bird::mapIndexToOF(int index) {
 }
 
 void Bird::draw() {
+	camera->begin();
 	ofSetColor(100, 255, 255);
 	renderFBO.draw(0, 0);
+	camera->end();
 
  //   //material.begin();
  //   pointLight.enable();

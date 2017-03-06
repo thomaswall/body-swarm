@@ -2,6 +2,8 @@
 
 #include "ofMain.h"
 #include "Bird.h"
+#include "ofVRCamera.h"
+#include "Kinect.h"
 
 class ofApp : public ofBaseApp{
 
@@ -26,7 +28,10 @@ class ofApp : public ofBaseApp{
         ofColor color;
         ofMesh mesh;
         of3dPrimitive primitive;
-        Bird bird;
+        Bird* bird = nullptr;
+
+		IKinectSensor* kinect = nullptr;
+		//ofVRCamera* camera;
     
         ofVideoPlayer vp;
         ofLight pointLight;

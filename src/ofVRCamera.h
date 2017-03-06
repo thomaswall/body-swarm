@@ -20,6 +20,7 @@ public:
 private:
 	IKinectSensor* kinect;
 
+	//ofCamera camera;
 	ofEasyCam camera;
 
 	IBodyFrameReader* bodyFrameReader;
