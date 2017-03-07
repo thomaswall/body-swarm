@@ -7,10 +7,7 @@ void ofApp::setup(){
     ofEnableLighting();
     ofEnableDepthTest();
     ofSetSmoothLighting(true);
-    //ofSetVerticalSync(true);
-    
-    vp.load("/Users/thomaswall/Desktop/movie1.mov");
-    vp.play();
+    //ofSetVerticalSync(false);
 
 	GetDefaultKinectSensor(&kinect);
 
@@ -26,7 +23,7 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    vp.update();
+    //vp.update();
 	bird->update();
 	//camera->update();
 }
@@ -38,7 +35,7 @@ void ofApp::draw(){
 	//camera->begin();
     bird->draw();
 
-    ofTexture mesh = vp.getTexture();
+    //ofTexture mesh = vp.getTexture();
     ofDisableLighting();
    // mesh.draw(-800,-700, -1000, 2700, 2200);
     ofEnableLighting();

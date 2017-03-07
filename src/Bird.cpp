@@ -4,6 +4,18 @@
 Bird::Bird(IKinectSensor* _sensor) {
 	this->sensor = _sensor;
 	camera = new ofVRCamera(sensor);
+
+	background.load("background.jpg");
+	//vp.setPixelFormat(OF_PIXELS_NATIVE);
+	//vp.load("movie2.avi");
+	//vp.play();
+
+	plane1.set(1000, 2200);
+	plane1.setPosition(0, 500, -500);
+
+	box.set(2700, 2200, 7000);
+	box.setResolution(100, 100, 100);
+	box.setPosition(500, 500, -1000);
 }
 
 void Bird::init(int amt) {
@@ -250,8 +262,11 @@ void Bird::update() {
 
 	posPingPong.swap();
 
+	camera->update();
+	//vp.update();
 
 	renderFBO.begin();
+	camera->begin();
 	ofClear(0, 0, 0, 0);
 	updateRender.begin();
 	updateRender.setUniformTexture("posTex", posPingPong.dst->getTexture(), 0);
@@ -272,9 +287,21 @@ void Bird::update() {
 	glEnd();
 
 	updateRender.end();
+
+	//vp.writeToTexture(vp_mesh);
+	//vp_mesh.draw(-800, -700, -1000, 2700, 2200);
+	//vp.draw(0, 0, 10, 20);
+
+	/*ofPushMatrix();
+	ofRotateY(90);
+	plane1.drawWireframe();
+	ofPopMatrix();*/
+	box.drawWireframe();
+
+	camera->end();
+	background.draw(-900, -800, -4000, 3000, 2500);
 	renderFBO.end();
 	ofPopStyle();
-	camera->update();
 }
 
 ofVec3f Bird::mapIndexToOF(int index) {
@@ -282,24 +309,6 @@ ofVec3f Bird::mapIndexToOF(int index) {
 }
 
 void Bird::draw() {
-	camera->begin();
-	ofSetColor(100, 255, 255);
+	ofSetColor(255, 255, 255);
 	renderFBO.draw(0, 0);
-	camera->end();
-
- //   //material.begin();
- //   pointLight.enable();
- //   pointLight2.enable();
-	//shader.begin();
-	//shader.setUniformBuffer("AllVertices", allverts);
-	//shader.setUniformBuffer("AllVertices2", allverts2);
- //   primitive.draw();
-	//ofLog(OF_LOG_NOTICE) << primitive.getMesh().getVertex(0 * 6 + 3);
-	//for(int i = 0; i < amount; i++)
-	//	positions[i] = primitive.getMesh().getVertex(i*6+3);
-
-	//shader.end();
- //   pointLight.disable();
- //   pointLight2.disable();
-    //material.end();
 }

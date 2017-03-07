@@ -117,4 +117,10 @@ public:
 	int imageHeight;
 
 	ofVRCamera* camera;
+	//ofxDSHapVideoPlayer vp;
+	ofTexture vp_mesh;
+	ofImage background;
+
+	ofPlanePrimitive plane1;
+	ofBoxPrimitive box;
 };
