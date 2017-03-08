@@ -296,10 +296,10 @@ void Bird::update() {
 	ofRotateY(90);
 	plane1.drawWireframe();
 	ofPopMatrix();*/
-	box.drawWireframe();
-
+	//box.drawWireframe();
+	background.draw(-900, -800, -1000, 3000, 2500);
 	camera->end();
-	background.draw(-900, -800, -4000, 3000, 2500);
+
 	renderFBO.end();
 	ofPopStyle();
 }

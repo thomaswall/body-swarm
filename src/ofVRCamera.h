@@ -14,7 +14,7 @@ public:
 	void end();
 	void zeroOutCamera();
 
-	float scale = 500;
+	float scale = 100;
 
 	~ofVRCamera();
 private:
@@ -33,6 +33,8 @@ private:
 
 	CameraSpacePoint* InitialNose = nullptr;
 	CameraSpacePoint diff;
+
+	UINT64 currentTrackedDude = -1;
 
 };
 

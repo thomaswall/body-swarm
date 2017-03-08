@@ -48,6 +48,7 @@ void ofVRCamera::update()
 	HRESULT hr = E_FAIL;
 	IBody* ppBodies[BODY_COUNT] = { 0 };
 
+	boolean breakify = false;
 	if (bodyFrameReader != nullptr)
 	{
 		IBodyFrame* bframe = nullptr;
@@ -59,8 +60,10 @@ void ofVRCamera::update()
 
 		if (SUCCEEDED(hr))
 		{
+			bool haveSeenTrackedDude = false;
 			for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
 			{
+				
 				IHighDefinitionFaceFrame* faceFrame = nullptr;
 				hr = faceFrameReaders[iFace]->AcquireLatestFrame(&faceFrame);
 
@@ -70,16 +73,37 @@ void ofVRCamera::update()
 					faceFrame->get_IsTrackingIdValid(&faceTracked);
 				}
 
+				ofLog(OF_LOG_VERBOSE, "%d is index", iFace);
 				if (faceTracked)
 				{
+					UINT64 faceId;
+					faceFrame->get_TrackingId(&faceId);
+
+					if (currentTrackedDude == -1) {
+						ofLogVerbose("Setting tracked dude");
+						currentTrackedDude = faceId;
+						haveSeenTrackedDude = true;
+					}
+					if (currentTrackedDude == faceId) {
+						haveSeenTrackedDude = true;
+					}
+						
+
+					ofLog(OF_LOG_VERBOSE, "tracking id %d, index: %i", faceId, iFace);
 					IFaceAlignment* faceAlignment = nullptr;
 					CreateFaceAlignment(&faceAlignment);
 					faceFrame->GetAndRefreshFaceAlignmentResult(faceAlignment);
 
 					FaceAlignmentQuality* quality = new FaceAlignmentQuality();
 					faceAlignment->get_Quality(quality);
-					if (quality == nullptr || *quality != FaceAlignmentQuality_High)
-						return;
+					if (currentTrackedDude != faceId || quality == nullptr ){//|| *quality != FaceAlignmentQuality_Low) {
+						faceAlignment->Release();
+						ofLogVerbose("goto because of bad quality");
+						goto outofloop;
+						breakify = true;
+						break;
+					}
+						
 
 					float* deformations = new float[FaceShapeDeformations_Count];
 					IFaceModel* faceModel = nullptr;
@@ -92,6 +116,7 @@ void ofVRCamera::update()
 					//CameraSpacePoint* nose = &vertices[HighDetailFacePoints_NoseTip];
 					CameraSpacePoint* nose = new CameraSpacePoint();
 					faceAlignment->get_HeadPivotPoint(nose);
+					
 
 					if (InitialNose == nullptr) {
 						InitialNose = new CameraSpacePoint();
@@ -107,22 +132,54 @@ void ofVRCamera::update()
 					diff.Y = (nose->Y - InitialNose->Y) * scale;
 					diff.Z = (nose->Z - InitialNose->Z) * scale;
 
+					
 					auto curr = camera.getPosition();
-					camera.setPosition(ofVec3f(ofGetWindowWidth() / 2 + diff.X, ofGetWindowHeight() / 2 - diff.Y, 665 + diff.Z));
+					
+					if (isnan(diff.X) || isnan(diff.Y) || isnan(diff.Z))
+					{
+						ofLogVerbose("fuck");
+						if (faceFrame != nullptr) {
+							faceModel->Release();
+							faceFrame->Release();
+						}
+						ofLogVerbose("goto because of nan");
+						goto outofloop;
+						breakify = true;
+						break;
+					}
+
+					if (InitialNose != nullptr && (diff.X == 0.00 && diff.Y == 0.00 && diff.Z == 0.00))
+					{
+						ofLog(OF_LOG_NOTICE) << diff.X << " " << diff.Y;
+						if (faceFrame != nullptr) {
+							faceModel->Release();
+							faceFrame->Release();
+						}
+						ofLogVerbose("goto because of 0 0 0");
+						goto outofloop;
+						breakify = true;
+						break;
+					}
+					if (diff.Z < -200) {
+						diff.Z = 0;
+					}
+					camera.setPosition(ofVec3f(ofGetWindowWidth() / 2 + diff.X, ofGetWindowHeight() / 2 - diff.Y, 200 + diff.Z));
 					//camera.setLensOffset(ofVec2f(-diff.X / 500, diff.Y / 500));
-					camera.lookAt(ofVec3f(ofGetWindowWidth() / 2 - diff.X / 10, ofGetWindowHeight() / 2 - diff.Y / 10, 100));
+					camera.lookAt(ofVec3f(ofGetWindowWidth() / 2 - diff.X / 10, ofGetWindowHeight() / 2 - diff.Y, -100));
 					curr = camera.getPosition();
 
 					auto lookdir = camera.getLookAtDir();
 
 					//ofLog(OF_LOG_VERBOSE, "initial location is <%.3f, %.3f, %.3f>", InitialNose->X, InitialNose->Y, InitialNose->Z);
-					ofLog(OF_LOG_VERBOSE, "nose location is <%.3f, %.3f, %.3f>", diff.X, diff.Y, diff.Z);
+					/*ofLog(OF_LOG_VERBOSE, "nose location is <%.3f, %.3f, %.3f>", diff.X, diff.Y, diff.Z);
 					ofLog(OF_LOG_VERBOSE, "cam diff location is <%.3f, %.3f, %.3f>", curr.x - ofGetWindowWidth() / 2, curr.y - ofGetWindowHeight() / 2, curr.z);
 					ofLog(OF_LOG_VERBOSE, "cam look direction is <%.3f, %.3f, %.3f>", lookdir.x, lookdir.y, lookdir.z);
-
+					*/
 					delete[] vertices;
 					delete[] deformations;
 					faceModel->Release();
+					faceAlignment->Release();
+					
 					//HighDetailFacePoints_NoseTip
 				}
 				else
@@ -145,12 +202,28 @@ void ofVRCamera::update()
 					}
 				}
 
+				
+					
 				if (faceFrame != nullptr) {
 					faceFrame->Release();
 				}
+				if (faceTracked)
+				{
+					ofLogVerbose("goto because of facetracked");
+					goto outofloop;
+					break;
+				}
+					
+			}
+			if (!haveSeenTrackedDude) {
+				ofLogVerbose("havent seen tracked dude - resetting");
+				currentTrackedDude = -1;
 			}
 		}
 
+	outofloop:
+		ofLogVerbose("out of loop!!!");
+		
 		for (int i = 0; i < _countof(ppBodies); i++) {
 			if (ppBodies[i] != nullptr)
 				ppBodies[i]->Release();

@@ -37,78 +37,78 @@ void main(void){
 		vec3 t_vel = normalize(vVelocity[i]);
 
 		float angle = sin(acos(dot(vec3(0,1,0), t_vel)));
-		float sunlight = 0.55 + angle / 4;
+		float sunlight = 0.3 + angle / 4;
 
         gl_Position = modelViewProjectionMatrix * ( vPosition[i] + vec4((orth*size + wingd*sin((time + float(vertexid[i])/2.0)*6)*(size*0.7)), 0.0));
         vTexCoord.x = 0.0;
         vTexCoord.y = 0.0;
-		fColor = vec3(1.0, 0.0, 1.0);
+		fColor = vec3(0.0, 0.0, 0.0);
         EmitVertex();
         
         gl_Position = modelViewProjectionMatrix * (vPosition[i]);
         vTexCoord.x = imgWidth;
         vTexCoord.y = 0.0;
-		fColor = vec3(1.0, 0.0, 1.0);
+		fColor = vec3(0.0, 0.0, 0.0);
         EmitVertex();
         
         gl_Position = modelViewProjectionMatrix * (vPosition[i] + vec4(t_vel*size,0.0));
         vTexCoord.x = imgWidth;
         vTexCoord.y = imgHeight;
-		fColor = vec3(1.0, 0.0, 1.0);
+		fColor = vec3(0.0, 0.0, 0.0);
         EmitVertex();
 
         gl_Position = modelViewProjectionMatrix * (vPosition[i]);
         vTexCoord.x = 0.0;
         vTexCoord.y = 0.0;
-		fColor = vec3(1.0, 0.0, 1.0);
+		fColor = vec3(0.0, 0.0, 0.0);
         EmitVertex();
         
         gl_Position = modelViewProjectionMatrix * (vPosition[i] + vec4(t_vel*size,0.0));
         vTexCoord.x = 0.0;
         vTexCoord.y = imgHeight;
-		fColor = vec3(1.0, 0.0, 1.0);
+		fColor = vec3(0.0, 0.0, 0.0);
         EmitVertex();
         
         gl_Position = modelViewProjectionMatrix * (vPosition[i] - vec4(orth*size,0.0) + vec4(wingd*sin((time + float(vertexid[i])/2.0)*6)*(size*0.7), 0.0));
         vTexCoord.x = imgWidth;
         vTexCoord.y = imgHeight;
-		fColor = vec3(1.0, 0.0, 1.0);
+		fColor = vec3(0.0, 0.0, 0.0);
         EmitVertex();
 
 		gl_Position = modelViewProjectionMatrix * (vPosition[i] - vec4(orth*size,0.0) + vec4(wingd*sin((time + float(vertexid[i])/2.0)*6)*(size*0.7), 0.0) - vec4(0,0.1,0,0));
         vTexCoord.x = imgWidth;
         vTexCoord.y = imgHeight;
-		fColor = vec3(1.0, sunlight, 1.0);
+		fColor = vec3(sunlight, sunlight, sunlight);
         EmitVertex();
 
 		gl_Position = modelViewProjectionMatrix * (vPosition[i] + vec4(t_vel*size,0.0) - vec4(0,0.1,0,0));
         vTexCoord.x = 0.0;
         vTexCoord.y = imgHeight;
-		fColor = vec3(1.0, sunlight, 1.0);
+		fColor = vec3(sunlight, sunlight, sunlight);
         EmitVertex();
 
 		gl_Position = modelViewProjectionMatrix * (vPosition[i] - vec4(0,0.1,0,0));
         vTexCoord.x = 0.0;
         vTexCoord.y = 0.0;
-		fColor = vec3(1.0, sunlight, 1.0);
+		fColor = vec3(sunlight, sunlight, sunlight);
         EmitVertex();
 
 		gl_Position = modelViewProjectionMatrix * (vPosition[i] + vec4(t_vel*size,0.0) - vec4(0,0.1,0,0));
         vTexCoord.x = imgWidth;
         vTexCoord.y = imgHeight;
-		fColor = vec3(1.0, sunlight, 1.0);
+		fColor = vec3(sunlight, sunlight, sunlight);
         EmitVertex();
 
 		gl_Position = modelViewProjectionMatrix * (vPosition[i] - vec4(0,0.1,0,0));
         vTexCoord.x = imgWidth;
         vTexCoord.y = 0.0;
-		fColor = vec3(1.0, sunlight, 1.0);
+		fColor = vec3(sunlight, sunlight, sunlight);
         EmitVertex();
 
 		gl_Position = modelViewProjectionMatrix * ( vPosition[i] + vec4((orth*size + wingd*sin((time + float(vertexid[i])/2.0)*6)*(size*0.7)), 0.0) - vec4(0,0.1,0,0));
         vTexCoord.x = 0.0;
         vTexCoord.y = 0.0;
-		fColor = vec3(1.0, sunlight, 1.0);
+		fColor = vec3(sunlight, sunlight, sunlight);
         EmitVertex();
 
 
