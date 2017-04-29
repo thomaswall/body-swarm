@@ -51,11 +51,13 @@ void Bird::init(int amt) {
     amount = amt;
     boid_dist = 20;
     
+	int height = ofGetHeight();
+	int width = ofGetWidth();
     for(int i=0; i < amount; i++) {
         ofVec3f origin = ofVec3f(
-            ofRandom(0, 1000),
-            ofRandom(0, 800),
-            ofRandom(-300, 300)
+            ofRandom(0, width),
+            ofRandom(0, height),
+            ofRandom(-500, 300)
         );
         
         velocities.push_back(ofVec3f(ofRandom(-1, 1),ofRandom(-1, 1),ofRandom(-1, 1)));
@@ -119,9 +121,9 @@ void Bird::init(int amt) {
 		for (int y = 0; y < textureRes; y++) {
 			int i = textureRes * y + x;
 
-			pos[i * 3 + 0] = ofRandom(1000.0); //x*offset;
-			pos[i * 3 + 1] = ofRandom(800.0); //y*offset;
-			pos[i * 3 + 2] = ofRandom(-300.0, 300.0);
+			pos[i * 3 + 0] = ofRandom(width); //x*offset;
+			pos[i * 3 + 1] = ofRandom(height); //y*offset;
+			pos[i * 3 + 2] = ofRandom(-500.0, 300.0);
 		}
 	}
 
@@ -234,6 +236,8 @@ void Bird::update() {
 	updateVel.setUniformTexture("velData", velPingPong.src->getTexture(), 0);   // passing the previus velocity information
 	updateVel.setUniformTexture("posData", posPingPong.src->getTexture(), 1);  // passing the position information
 	updateVel.setUniform1i("resolution", (int)textureRes);
+	updateVel.setUniform1i("width", (int)ofGetWidth());
+	updateVel.setUniform1i("height", (int)ofGetHeight());
 	updateVel.setUniform3fv("people_points", people_uniform, 1000);
 	updateVel.setUniform1i("people_size", people_size);
 
@@ -297,7 +301,7 @@ void Bird::update() {
 	plane1.drawWireframe();
 	ofPopMatrix();*/
 	//box.drawWireframe();
-	background.draw(-900, -800, -1000, 3000, 2500);
+	background.draw(-900, -800, -1000, 4000, 2500);
 	camera->end();
 
 	renderFBO.end();

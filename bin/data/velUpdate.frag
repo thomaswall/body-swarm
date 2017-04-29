@@ -6,6 +6,8 @@ in vec4 position;
 uniform sampler2DRect velData;   // previous velocity texture
 uniform sampler2DRect posData;      // position texture
 uniform int resolution;
+uniform int width;
+uniform int height;
 uniform vec3 people_points[1000];
 uniform int people_size;
 
@@ -33,19 +35,19 @@ vec3 avoidWalls(vec3 pos) {
     vec = vec3(0, pos.y, pos.z);
     sum += avoider(vec, pos);
     
-    vec = vec3(1000, pos.y, pos.z);
+    vec = vec3(width, pos.y, pos.z);
     sum += avoider(vec, pos);
     
     vec = vec3(pos.x, 0, pos.z);
     sum += avoider(vec, pos);
     
-    vec = vec3(pos.x, 800, pos.z);
+    vec = vec3(pos.x, height, pos.z);
     sum += avoider(vec, pos);
     
     vec = vec3(pos.x, pos.y, 300);
     sum += avoider(vec, pos);
     
-    vec = vec3(pos.x, pos.y, -300);
+    vec = vec3(pos.x, pos.y, -500);
     sum += avoider(vec, pos);
     
     return sum;
